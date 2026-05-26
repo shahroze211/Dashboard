@@ -17,6 +17,7 @@ function buildValues(data: z.infer<typeof deadlineInputSchema>) {
   return {
     title: data.title,
     category: data.category,
+    subcategory: data.subcategory?.trim() || null,
     dueAt: data.dueAt,
     notes: data.notes?.trim() || null,
     done: data.done,

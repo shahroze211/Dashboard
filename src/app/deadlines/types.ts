@@ -8,6 +8,7 @@ export const deadlineInputSchema = z.object({
     .min(1, "Title is required")
     .max(200, "Title is too long"),
   category: z.enum(DEADLINE_CATEGORIES).default("other"),
+  subcategory: z.string().trim().max(60).optional().or(z.literal("")),
   dueAt: z
     .union([z.string(), z.date()])
     .transform((v) => (v instanceof Date ? v : new Date(v)))

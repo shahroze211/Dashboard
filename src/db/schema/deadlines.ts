@@ -19,6 +19,7 @@ export const deadlines = pgTable("deadlines", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   category: deadlineCategory("category").notNull().default("other"),
+  subcategory: text("subcategory"),
   dueAt: timestamp("due_at", { withTimezone: true }).notNull(),
   notes: text("notes"),
   done: boolean("done").notNull().default(false),

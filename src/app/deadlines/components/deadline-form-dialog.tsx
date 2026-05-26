@@ -34,6 +34,7 @@ import { createDeadline, updateDeadline } from "../actions"
 type FormValues = {
   title: string
   category: (typeof DEADLINE_CATEGORIES)[number]
+  subcategory: string
   dueAt: string
   notes: string
   done: boolean
@@ -42,6 +43,7 @@ type FormValues = {
 const toFormValues = (d?: Deadline): FormValues => ({
   title: d?.title ?? "",
   category: d?.category ?? "other",
+  subcategory: d?.subcategory ?? "",
   dueAt: d
     ? format(d.dueAt, "yyyy-MM-dd'T'HH:mm")
     : format(new Date(), "yyyy-MM-dd'T'HH:mm"),
@@ -150,6 +152,15 @@ export function DeadlineFormDialog({
                 </SelectContent>
               </Select>
             </div>
+          </div>
+          <div>
+            <Label className="mb-1.5 block text-xs text-muted-foreground">
+              Subcategory <span className="text-muted-foreground/60">(optional, free-form)</span>
+            </Label>
+            <Input
+              placeholder="Uni Applications, Internships…"
+              {...form.register("subcategory")}
+            />
           </div>
           <div>
             <Label className="mb-1.5 block text-xs text-muted-foreground">

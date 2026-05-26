@@ -17,11 +17,33 @@ type Group = {
   faded?: boolean
 }
 
+type SubGroup = {
+  sub: string | null
+  items: Deadline[]
+}
+
 function relative(date: Date, now: Date) {
   if (date.getTime() < now.getTime()) {
     return `${formatDistanceToNowStrict(date)} ago`
   }
   return `in ${formatDistanceToNowStrict(date)}`
+}
+
+function groupBySubcategory(items: Deadline[]): SubGroup[] {
+  const map = new Map<string | null, Deadline[]>()
+  for (const item of items) {
+    const key = item.subcategory?.trim() || null
+    const list = map.get(key)
+    if (list) list.push(item)
+    else map.set(key, [item])
+  }
+  const entries = [...map.entries()]
+  entries.sort(([a], [b]) => {
+    if (a === null) return 1
+    if (b === null) return -1
+    return a.localeCompare(b)
+  })
+  return entries.map(([sub, items]) => ({ sub, items }))
 }
 
 export function DeadlinesList({ deadlines }: { deadlines: Deadline[] }) {
@@ -89,8 +111,11 @@ export function DeadlinesList({ deadlines }: { deadlines: Deadline[] }) {
 
   return (
     <div className="space-y-8">
-      {groups.map((g) =>
-        g.items.length === 0 ? null : (
+      {groups.map((g) => {
+        if (g.items.length === 0) return null
+        const subgroups = groupBySubcategory(g.items)
+        const hasSubcategories = subgroups.some((s) => s.sub !== null)
+        return (
           <section key={g.key}>
             <h2
               className={cn(
@@ -103,43 +128,59 @@ export function DeadlinesList({ deadlines }: { deadlines: Deadline[] }) {
                 {g.items.length}
               </span>
             </h2>
-            <ul className="divide-y divide-border rounded-lg border border-border">
-              {g.items.map((d) => (
-                <li
-                  key={d.id}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-3",
-                    g.faded && "opacity-60",
-                    g.emphasize && "italic"
-                  )}
-                >
-                  <DeadlineCheckbox id={d.id} done={d.done} />
-                  <div className="min-w-0 flex-1">
-                    <p
-                      className={cn(
-                        "truncate text-sm",
-                        d.done && "line-through decoration-muted-foreground/40"
-                      )}
-                    >
-                      {d.title}
-                    </p>
-                    <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>
-                        {DEADLINE_CATEGORY_LABELS[d.category as DeadlineCategory]}
+            <div className="space-y-4">
+              {subgroups.map(({ sub, items }) => (
+                <div key={sub ?? "_none"}>
+                  {hasSubcategories ? (
+                    <p className="mb-2 px-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/80">
+                      {sub ?? "Unsorted"}
+                      <span className="ml-1.5 text-muted-foreground/50">
+                        {items.length}
                       </span>
-                      <span aria-hidden>·</span>
-                      <span>{format(d.dueAt, "MMM d, h:mm a")}</span>
-                      <span aria-hidden>·</span>
-                      <span>{relative(d.dueAt, now)}</span>
-                    </div>
-                  </div>
-                  <DeadlineRowActions deadline={d} />
-                </li>
+                    </p>
+                  ) : null}
+                  <ul className="divide-y divide-border rounded-lg border border-border">
+                    {items.map((d) => (
+                      <li
+                        key={d.id}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3",
+                          g.faded && "opacity-60",
+                          g.emphasize && "italic"
+                        )}
+                      >
+                        <DeadlineCheckbox id={d.id} done={d.done} />
+                        <div className="min-w-0 flex-1">
+                          <p
+                            className={cn(
+                              "truncate text-sm",
+                              d.done && "line-through decoration-muted-foreground/40"
+                            )}
+                          >
+                            {d.title}
+                          </p>
+                          <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>
+                              {DEADLINE_CATEGORY_LABELS[
+                                d.category as DeadlineCategory
+                              ]}
+                            </span>
+                            <span aria-hidden>·</span>
+                            <span>{format(d.dueAt, "MMM d, h:mm a")}</span>
+                            <span aria-hidden>·</span>
+                            <span>{relative(d.dueAt, now)}</span>
+                          </div>
+                        </div>
+                        <DeadlineRowActions deadline={d} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
+            </div>
           </section>
         )
-      )}
+      })}
     </div>
   )
 }
