@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowUpRight } from "lucide-react"
+import { ArrowUpRight, CalendarClock } from "lucide-react"
 import { asc, eq } from "drizzle-orm"
 import { db } from "@/db"
 import { deadlines } from "@/db/schema"
@@ -43,7 +43,10 @@ export async function DeadlinesWidget() {
     <Link href="/deadlines" className="group block">
       <Card className="h-full transition-colors group-hover:border-foreground/20">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle>Deadlines</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarClock className="h-3.5 w-3.5 text-muted-foreground" />
+            Deadlines
+          </CardTitle>
           <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
         </CardHeader>
         <CardContent className="pt-0">
