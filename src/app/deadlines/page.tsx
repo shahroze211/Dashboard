@@ -1,14 +1,26 @@
+import { asc } from "drizzle-orm"
+import { db } from "@/db"
+import { deadlines as deadlinesTable } from "@/db/schema"
 import { PageHeader } from "@/components/shared/page-header"
-import { EmptyState } from "@/components/shared/empty-state"
+import { DeadlinesList } from "./components/deadlines-list"
+import { AddDeadlineButton } from "./components/add-deadline-button"
 
-export default function DeadlinesPage() {
+export const dynamic = "force-dynamic"
+
+export default async function DeadlinesPage() {
+  const rows = await db
+    .select()
+    .from(deadlinesTable)
+    .orderBy(asc(deadlinesTable.dueAt))
+
   return (
-    <div className="mx-auto max-w-6xl">
-      <PageHeader title="Deadlines" />
-      <EmptyState
-        title="Coming soon"
-        description="This module is on the roadmap. See STATUS.md."
+    <div className="mx-auto max-w-3xl">
+      <PageHeader
+        title="Deadlines"
+        description="What's due and when."
+        actions={<AddDeadlineButton />}
       />
+      <DeadlinesList deadlines={rows} />
     </div>
   )
 }

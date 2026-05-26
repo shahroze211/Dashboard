@@ -1,1 +1,5 @@
 export * from "./jobs"
+export * from "./deadlines"
+export * from "./goals"
+export * from "./gym"
+export * from "./nutrition"

@@ -1,14 +1,26 @@
+import { asc, desc } from "drizzle-orm"
+import { db } from "@/db"
+import { goals as goalsTable } from "@/db/schema"
 import { PageHeader } from "@/components/shared/page-header"
-import { EmptyState } from "@/components/shared/empty-state"
+import { GoalsList } from "./components/goals-list"
+import { AddGoalButton } from "./components/add-goal-button"
 
-export default function GoalsPage() {
+export const dynamic = "force-dynamic"
+
+export default async function GoalsPage() {
+  const rows = await db
+    .select()
+    .from(goalsTable)
+    .orderBy(asc(goalsTable.done), desc(goalsTable.periodStart))
+
   return (
-    <div className="mx-auto max-w-6xl">
-      <PageHeader title="Goals" />
-      <EmptyState
-        title="Coming soon"
-        description="This module is on the roadmap. See STATUS.md."
+    <div className="mx-auto max-w-3xl">
+      <PageHeader
+        title="Goals"
+        description="What I'm working toward."
+        actions={<AddGoalButton />}
       />
+      <GoalsList goals={rows} />
     </div>
   )
 }

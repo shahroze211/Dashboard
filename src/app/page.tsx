@@ -1,6 +1,9 @@
 import { PageHeader } from "@/components/shared/page-header"
-import { PlaceholderWidget } from "@/components/shared/placeholder-widget"
 import { JobsWidget } from "./jobs/components/jobs-widget"
+import { DeadlinesWidget } from "./deadlines/components/deadlines-widget"
+import { GoalsWidget } from "./goals/components/goals-widget"
+import { GymWidget } from "./gym/components/gym-widget"
+import { NutritionWidget } from "./nutrition/components/nutrition-widget"
 
 export const dynamic = "force-dynamic"
 
@@ -13,22 +16,10 @@ export default function DashboardHome() {
       />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <JobsWidget />
-        <PlaceholderWidget
-          title="Deadlines"
-          hint="Coming next."
-          href="/deadlines"
-        />
-        <PlaceholderWidget
-          title="Goals"
-          hint="Not built yet."
-          href="/goals"
-        />
-        <PlaceholderWidget title="Gym" hint="Not built yet." href="/gym" />
-        <PlaceholderWidget
-          title="Nutrition"
-          hint="Not built yet."
-          href="/nutrition"
-        />
+        <DeadlinesWidget />
+        <GoalsWidget />
+        <GymWidget />
+        <NutritionWidget />
       </div>
     </div>
   )
