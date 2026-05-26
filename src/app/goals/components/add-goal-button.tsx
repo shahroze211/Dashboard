@@ -3,10 +3,12 @@
 import { useState } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useAutoOpenFromQuery } from "@/lib/use-auto-open"
 import { GoalFormDialog } from "./goal-form-dialog"
 
 export function AddGoalButton() {
   const [open, setOpen] = useState(false)
+  useAutoOpenFromQuery("add", setOpen)
   return (
     <>
       <Button size="sm" onClick={() => setOpen(true)}>
