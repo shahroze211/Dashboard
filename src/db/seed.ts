@@ -1,7 +1,4 @@
-import * as dotenv from "dotenv"
-dotenv.config({ path: ".env.local" })
-dotenv.config()
-
+import "./load-env"
 import { db } from "./index"
 import {
   jobs,
