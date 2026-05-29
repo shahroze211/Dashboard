@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm"
 import { z } from "zod"
 import { db } from "@/db"
 import { nutritionEntries } from "@/db/schema"
-import { nutritionInputSchema } from "./types"
+import { nutritionInputSchema, type FoodSearchItem } from "./types"
 
 const idSchema = z.number().int().positive()
 
@@ -143,5 +143,64 @@ export async function lookupFood(barcode: string): Promise<LookupResult> {
     }
   } catch {
     return { ok: false, error: "Lookup failed" }
+  }
+}
+
+// ---------- OpenFoodFacts search-by-name (fallback when no barcode) ----------
+
+type OFFSearchProduct = OFFProduct & {
+  code?: string
+  brands?: string
+}
+
+function round1(n: number): number {
+  return Math.round(n * 10) / 10
+}
+
+export async function searchFoods(query: string): Promise<FoodSearchItem[]> {
+  const q = query.trim()
+  if (q.length < 2) return []
+  try {
+    const url =
+      "https://world.openfoodfacts.org/cgi/search.pl?" +
+      new URLSearchParams({
+        search_terms: q,
+        search_simple: "1",
+        action: "process",
+        json: "1",
+        page_size: "10",
+        fields: "product_name,product_name_en,generic_name,brands,code,nutriments",
+      }).toString()
+
+    const res = await fetch(url, {
+      next: { revalidate: 3600 },
+      headers: { "User-Agent": "DashboardApp/0.1 (personal)" },
+    })
+    if (!res.ok) return []
+    const json = (await res.json()) as { products?: OFFSearchProduct[] }
+
+    const out: FoodSearchItem[] = []
+    for (const p of json.products ?? []) {
+      const name =
+        p.product_name?.trim() ||
+        p.product_name_en?.trim() ||
+        p.generic_name?.trim() ||
+        ""
+      if (!name) continue
+      const n = p.nutriments ?? {}
+      out.push({
+        name,
+        brand: p.brands?.split(",")[0]?.trim() || null,
+        calories: round1(Number(n["energy-kcal_100g"] ?? 0)),
+        protein: round1(Number(n.proteins_100g ?? 0)),
+        carbs: round1(Number(n.carbohydrates_100g ?? 0)),
+        fat: round1(Number(n.fat_100g ?? 0)),
+        barcode: p.code?.trim() || null,
+      })
+      if (out.length >= 8) break
+    }
+    return out
+  } catch {
+    return []
   }
 }

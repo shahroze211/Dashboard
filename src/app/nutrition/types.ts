@@ -25,3 +25,13 @@ export const nutritionInputSchema = z.object({
 
 export type NutritionInput = z.infer<typeof nutritionInputSchema>
 export type { NutritionEntry, NewNutritionEntry } from "@/db/schema/nutrition"
+
+export type FoodSearchItem = {
+  name: string
+  brand: string | null
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
+  barcode: string | null
+}

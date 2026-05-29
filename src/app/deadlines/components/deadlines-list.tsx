@@ -3,6 +3,7 @@ import {
   DEADLINE_CATEGORY_LABELS,
   type DeadlineCategory,
 } from "@/lib/constants"
+import type { DeadlineTiming } from "@/lib/holidays"
 import { cn } from "@/lib/utils"
 import { EmptyState } from "@/components/shared/empty-state"
 import type { Deadline } from "../types"
@@ -46,7 +47,13 @@ function groupBySubcategory(items: Deadline[]): SubGroup[] {
   return entries.map(([sub, items]) => ({ sub, items }))
 }
 
-export function DeadlinesList({ deadlines }: { deadlines: Deadline[] }) {
+export function DeadlinesList({
+  deadlines,
+  timings = {},
+}: {
+  deadlines: Deadline[]
+  timings?: Record<number, DeadlineTiming>
+}) {
   if (deadlines.length === 0) {
     return (
       <EmptyState
@@ -159,7 +166,7 @@ export function DeadlinesList({ deadlines }: { deadlines: Deadline[] }) {
                           >
                             {d.title}
                           </p>
-                          <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+                          <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                             <span>
                               {DEADLINE_CATEGORY_LABELS[
                                 d.category as DeadlineCategory
@@ -169,7 +176,27 @@ export function DeadlinesList({ deadlines }: { deadlines: Deadline[] }) {
                             <span>{format(d.dueAt, "MMM d, h:mm a")}</span>
                             <span aria-hidden>·</span>
                             <span>{relative(d.dueAt, now)}</span>
+                            {timings[d.id] ? (
+                              <>
+                                <span aria-hidden>·</span>
+                                <span className="tabular-nums">
+                                  {timings[d.id].workingDays} working days
+                                </span>
+                              </>
+                            ) : null}
                           </div>
+                          {timings[d.id]?.nextHoliday ? (
+                            <p className="mt-1 text-xs text-muted-foreground/70">
+                              {timings[d.id].nextHoliday!.name} (
+                              {format(
+                                new Date(
+                                  timings[d.id].nextHoliday!.date + "T00:00:00"
+                                ),
+                                "MMM d"
+                              )}
+                              ) falls before this.
+                            </p>
+                          ) : null}
                         </div>
                         <DeadlineRowActions deadline={d} />
                       </li>

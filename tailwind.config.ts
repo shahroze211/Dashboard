@@ -67,10 +67,37 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-14px)" },
+        },
+        "fade-in-up": {
+          from: { opacity: "0", transform: "translateY(12px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        "gradient-pan": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        "mesh-drift": {
+          "0%": { transform: "translate3d(0, 0, 0) scale(1)" },
+          "33%": { transform: "translate3d(3%, -4%, 0) scale(1.08)" },
+          "66%": { transform: "translate3d(-3%, 3%, 0) scale(0.96)" },
+          "100%": { transform: "translate3d(0, 0, 0) scale(1)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        float: "float 6s ease-in-out infinite",
+        "fade-in-up": "fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "fade-in": "fade-in 0.8s ease-out both",
+        "gradient-pan": "gradient-pan 8s ease-in-out infinite",
+        "mesh-drift": "mesh-drift 18s ease-in-out infinite",
       },
     },
   },

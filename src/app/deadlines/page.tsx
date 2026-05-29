@@ -1,6 +1,7 @@
 import { asc } from "drizzle-orm"
 import { db } from "@/db"
 import { deadlines as deadlinesTable } from "@/db/schema"
+import { getDeadlineTimings } from "@/lib/holidays"
 import { PageHeader } from "@/components/shared/page-header"
 import { DeadlinesList } from "./components/deadlines-list"
 import { AddDeadlineButton } from "./components/add-deadline-button"
@@ -13,6 +14,8 @@ export default async function DeadlinesPage() {
     .from(deadlinesTable)
     .orderBy(asc(deadlinesTable.dueAt))
 
+  const timings = await getDeadlineTimings(rows)
+
   return (
     <div className="mx-auto max-w-3xl">
       <PageHeader
@@ -20,7 +23,7 @@ export default async function DeadlinesPage() {
         description="What's due and when."
         actions={<AddDeadlineButton />}
       />
-      <DeadlinesList deadlines={rows} />
+      <DeadlinesList deadlines={rows} timings={timings} />
     </div>
   )
 }

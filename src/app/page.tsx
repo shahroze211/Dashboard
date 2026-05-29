@@ -1,8 +1,8 @@
-import { asc, eq } from "drizzle-orm"
+import { asc, eq, gte, sql } from "drizzle-orm"
 import { formatDistanceToNowStrict } from "date-fns"
 import { db } from "@/db"
-import { deadlines } from "@/db/schema"
-import { HomeGreeting } from "@/components/shared/home-greeting"
+import { deadlines, goals, gymEntries, jobs } from "@/db/schema"
+import { Hero, type HeroStat } from "@/components/shared/hero"
 import { JobsWidget } from "./jobs/components/jobs-widget"
 import { DeadlinesWidget } from "./deadlines/components/deadlines-widget"
 import { GoalsWidget } from "./goals/components/goals-widget"
@@ -29,17 +29,49 @@ async function getNextDeadlineHint(): Promise<string | undefined> {
   return `${shortTitle} — ${phrase}`
 }
 
+async function getHeroStats(): Promise<HeroStat[]> {
+  const weekAgo = new Date()
+  weekAgo.setHours(0, 0, 0, 0)
+  weekAgo.setDate(weekAgo.getDate() - 6)
+
+  const count = sql<number>`count(*)::int`
+  const [[jobsRow], [deadlinesRow], [goalsRow], [gymRow]] = await Promise.all([
+    db.select({ n: count }).from(jobs),
+    db.select({ n: count }).from(deadlines).where(eq(deadlines.done, false)),
+    db.select({ n: count }).from(goals).where(eq(goals.done, false)),
+    db.select({ n: count }).from(gymEntries).where(gte(gymEntries.performedAt, weekAgo)),
+  ])
+
+  return [
+    { label: "Applications", value: jobsRow?.n ?? 0 },
+    { label: "Open deadlines", value: deadlinesRow?.n ?? 0 },
+    { label: "Active goals", value: goalsRow?.n ?? 0 },
+    { label: "Sessions · 7d", value: gymRow?.n ?? 0 },
+  ]
+}
+
 export default async function DashboardHome() {
-  const hint = await getNextDeadlineHint()
+  const [hint, stats] = await Promise.all([getNextDeadlineHint(), getHeroStats()])
+  const widgets = [
+    <JobsWidget key="jobs" />,
+    <DeadlinesWidget key="deadlines" />,
+    <GoalsWidget key="goals" />,
+    <GymWidget key="gym" />,
+    <NutritionWidget key="nutrition" />,
+  ]
   return (
     <div className="mx-auto max-w-6xl">
-      <HomeGreeting hint={hint} />
+      <Hero hint={hint} stats={stats} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <JobsWidget />
-        <DeadlinesWidget />
-        <GoalsWidget />
-        <GymWidget />
-        <NutritionWidget />
+        {widgets.map((widget, i) => (
+          <div
+            key={widget.key}
+            className="h-full animate-fade-in-up [&>a]:h-full"
+            style={{ animationDelay: `${80 + i * 70}ms` }}
+          >
+            {widget}
+          </div>
+        ))}
       </div>
     </div>
   )

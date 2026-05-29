@@ -11,6 +11,7 @@ import {
 import { EmptyState } from "@/components/shared/empty-state"
 import { JOB_SOURCE_LABELS, type JobSource } from "@/lib/constants"
 import type { Job } from "../types"
+import { CompanyLogo } from "./company-logo"
 import { InlineStatusSelect } from "./inline-status-select"
 import { JobsRowActions } from "./jobs-row-actions"
 
@@ -51,7 +52,12 @@ export function JobsList({
         <TableBody>
           {jobs.map((job) => (
             <TableRow key={job.id}>
-              <TableCell className="font-medium">{job.company}</TableCell>
+              <TableCell className="font-medium">
+                <div className="flex items-center gap-2.5">
+                  <CompanyLogo company={job.company} link={job.link} />
+                  <span>{job.company}</span>
+                </div>
+              </TableCell>
               <TableCell className="text-muted-foreground">{job.role}</TableCell>
               <TableCell>
                 <InlineStatusSelect jobId={job.id} status={job.status} />

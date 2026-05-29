@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm"
 import { z } from "zod"
 import { db } from "@/db"
 import { gymEntries } from "@/db/schema"
-import { gymInputSchema } from "./types"
+import { gymInputSchema, type ExerciseSuggestion } from "./types"
 
 const idSchema = z.number().int().positive()
 
@@ -75,4 +75,41 @@ export async function deleteGymEntry(id: number): Promise<ActionResult> {
   revalidatePath("/gym")
   revalidatePath("/")
   return { ok: true, data: undefined }
+}
+
+// ---------- wger exercise autocomplete ----------
+
+type WgerSearchResponse = {
+  suggestions?: { value?: string; data?: { name?: string; category?: string } }[]
+}
+
+export async function searchExercises(
+  term: string
+): Promise<ExerciseSuggestion[]> {
+  const q = term.trim()
+  if (q.length < 2) return []
+  try {
+    const res = await fetch(
+      `https://wger.de/api/v2/exercise/search/?term=${encodeURIComponent(
+        q
+      )}&language=english&format=json`,
+      { next: { revalidate: 86_400 }, headers: { Accept: "application/json" } }
+    )
+    if (!res.ok) return []
+    const json = (await res.json()) as WgerSearchResponse
+    const seen = new Set<string>()
+    const out: ExerciseSuggestion[] = []
+    for (const s of json.suggestions ?? []) {
+      const name = (s.data?.name || s.value || "").trim()
+      if (!name) continue
+      const key = name.toLowerCase()
+      if (seen.has(key)) continue
+      seen.add(key)
+      out.push({ name, category: s.data?.category?.trim() || null })
+      if (out.length >= 8) break
+    }
+    return out
+  } catch {
+    return []
+  }
 }

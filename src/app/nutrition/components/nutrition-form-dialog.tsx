@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
-import { Scan } from "lucide-react"
+import { Scan, Search } from "lucide-react"
 import { toast } from "sonner"
 import {
   Dialog,
@@ -20,10 +20,12 @@ import { Button } from "@/components/ui/button"
 import {
   nutritionInputSchema,
   type NutritionEntry,
+  type FoodSearchItem,
 } from "../types"
 import {
   createNutritionEntry,
   lookupFood,
+  searchFoods,
   updateNutritionEntry,
 } from "../actions"
 
@@ -65,6 +67,9 @@ export function NutritionFormDialog({
   const isEdit = Boolean(entry)
   const [pending, startTransition] = useTransition()
   const [looking, setLooking] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [searching, setSearching] = useState(false)
+  const [results, setResults] = useState<FoodSearchItem[]>([])
 
   const form = useForm<FormValues>({
     resolver: zodResolver(nutritionInputSchema) as never,
@@ -72,8 +77,38 @@ export function NutritionFormDialog({
   })
 
   useEffect(() => {
-    if (open) form.reset(toFormValues(entry, defaultLoggedAt))
+    if (open) {
+      form.reset(toFormValues(entry, defaultLoggedAt))
+      setSearchTerm("")
+      setResults([])
+    }
   }, [open, entry, defaultLoggedAt, form])
+
+  const handleSearch = async () => {
+    const q = searchTerm.trim()
+    if (q.length < 2) {
+      toast.error("Type at least 2 characters")
+      return
+    }
+    setSearching(true)
+    const res = await searchFoods(q)
+    setSearching(false)
+    setResults(res)
+    if (res.length === 0) toast.error("No matches found")
+  }
+
+  const fillFromItem = (item: FoodSearchItem) => {
+    form.setValue("name", item.brand ? `${item.name} (${item.brand})` : item.name)
+    form.setValue("calories", String(item.calories))
+    form.setValue("protein", String(item.protein))
+    form.setValue("carbs", String(item.carbs))
+    form.setValue("fat", String(item.fat))
+    form.setValue("servingSize", "100g")
+    if (item.barcode) form.setValue("barcode", item.barcode)
+    setResults([])
+    setSearchTerm("")
+    toast.success("Filled from OpenFoodFacts")
+  }
 
   const handleLookup = async () => {
     const barcode = form.getValues("barcode")
@@ -124,10 +159,67 @@ export function NutritionFormDialog({
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit food" : "Log food"}</DialogTitle>
           <DialogDescription>
-            Enter macros manually, or paste a barcode and tap Lookup.
+            Search by name, paste a barcode, or enter macros manually.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} className="grid gap-4">
+          <div>
+            <Label className="mb-1.5 block text-xs text-muted-foreground">
+              Search by name
+            </Label>
+            <div className="grid grid-cols-[1fr_auto] items-end gap-2">
+              <Input
+                placeholder="e.g. greek yogurt"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault()
+                    handleSearch()
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleSearch}
+                disabled={searching}
+              >
+                <Search className="h-4 w-4" />
+                {searching ? "Searching…" : "Search"}
+              </Button>
+            </div>
+            {results.length > 0 ? (
+              <ul className="mt-2 max-h-48 overflow-auto rounded-md border border-border animate-fade-in">
+                {results.map((item, i) => (
+                  <li
+                    key={`${item.barcode ?? item.name}-${i}`}
+                    className="border-b border-border last:border-0"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => fillFromItem(item)}
+                      className="block w-full px-3 py-2 text-left hover:bg-accent"
+                    >
+                      <span className="block truncate text-sm">
+                        {item.name}
+                        {item.brand ? (
+                          <span className="text-muted-foreground">
+                            {" "}
+                            · {item.brand}
+                          </span>
+                        ) : null}
+                      </span>
+                      <span className="block text-xs text-muted-foreground tabular-nums">
+                        {item.calories} kcal · P{item.protein} C{item.carbs} F
+                        {item.fat} / 100g
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
           <div className="grid grid-cols-[1fr_auto] gap-2 items-end">
             <div>
               <Label className="mb-1.5 block text-xs text-muted-foreground">

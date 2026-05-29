@@ -15,7 +15,7 @@ This project is a portfolio piece **and** a tool I use. Both purposes must hold 
 These are binding. Code that violates them is wrong even if it passes tests.
 
 - **Low friction or nothing.** Logging an action takes ≤3 seconds. Smart defaults, minimal required fields, sensible auto-fill. If a form makes me think, the form is wrong.
-- **Calm, not noisy.** No red angry warnings. No streaks. No guilt notifications. No gamification. Data speaks plainly — a "3" doesn't need an exclamation mark.
+- **Calm, not noisy.** No red angry warnings. No streaks. No guilt notifications. No gamification. Data speaks plainly — a "3" doesn't need an exclamation mark. *(Exception, 2026-05-29: the dashboard **home** carries a bold animated hero for portfolio/landing impact — see deviations table. The "calm" rule still binds every module page and every interaction that touches my data.)*
 - **One screen tells me how I'm doing.** The dashboard home is the most important page. Every module contributes a summary widget.
 - **Mine, not a product.** No social features, no sharing, no account system, no analytics, no telemetry.
 - **Honest by default.** Empty states show emptiness. If there's no data, say so — don't hide the section to look fuller.
@@ -59,3 +59,5 @@ Items below are **binding rejections**, not "maybe later". To add one, the rejec
 | Module order | (unspecified, deadlines first in example) | jobs → deadlines → goals → gym → nutrition | `jobs` is the strongest first-shipped story given the project's portfolio purpose |
 | Reminder emails (Resend) | v1 | Deferred to v2 | Requires verified domain; not worth blocking v1 launch |
 | Tests | Not in DoD | Vitest, ≥3 server-action tests per module | Cheap signal that removes a reviewer's easiest criticism |
+| Home aesthetic | "Calm, not noisy" everywhere | Bold animated hero (floating image, parallax, gradient mesh, animated counters) on the **home page only** | Owner decision 2026-05-29: portfolio/LinkedIn impact. The hero is a presentational landing band above the widgets; it stores nothing, nudges nothing, tracks nothing. Module pages and all data interactions stay calm. |
+| External APIs | OpenFoodFacts only | + Nager.Date (deadlines), wger (gym), OpenFoodFacts search (nutrition), favicon service (job logos) | Owner decision 2026-05-29: enrich modules with keyless, server-cached lookups. None nudge behavior, none auto-import a feed, none add telemetry — so the binding rejections still hold. |

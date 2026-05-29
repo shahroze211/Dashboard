@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
@@ -27,6 +27,7 @@ import {
 import { WEIGHT_UNITS, type WeightUnit } from "@/lib/constants"
 import { gymInputSchema, type GymEntry } from "../types"
 import { createGymEntry, updateGymEntry } from "../actions"
+import { ExerciseAutocomplete } from "./exercise-autocomplete"
 
 type FormValues = {
   exercise: string
@@ -61,6 +62,7 @@ export function GymFormDialog({
 }) {
   const isEdit = Boolean(entry)
   const [pending, startTransition] = useTransition()
+  const [muscleHint, setMuscleHint] = useState<string | null>(null)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(gymInputSchema) as never,
@@ -68,7 +70,14 @@ export function GymFormDialog({
   })
 
   useEffect(() => {
-    if (open) form.reset(toFormValues(entry))
+    form.register("exercise")
+  }, [form])
+
+  useEffect(() => {
+    if (open) {
+      form.reset(toFormValues(entry))
+      setMuscleHint(null)
+    }
   }, [open, entry, form])
 
   const onSubmit = form.handleSubmit((values) => {
@@ -106,11 +115,19 @@ export function GymFormDialog({
             <Label className="mb-1.5 block text-xs text-muted-foreground">
               Exercise <span className="text-foreground/80">*</span>
             </Label>
-            <Input
-              autoFocus
-              placeholder="Bench press"
-              {...form.register("exercise")}
+            <ExerciseAutocomplete
+              value={form.watch("exercise")}
+              onChange={(v) => {
+                form.setValue("exercise", v, { shouldValidate: false })
+                if (muscleHint) setMuscleHint(null)
+              }}
+              onPickCategory={setMuscleHint}
             />
+            {muscleHint ? (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Targets: {muscleHint}
+              </p>
+            ) : null}
             {form.formState.errors.exercise ? (
               <p className="mt-1 text-xs text-destructive">
                 {form.formState.errors.exercise.message}

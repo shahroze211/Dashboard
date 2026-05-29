@@ -25,3 +25,5 @@ export const gymInputSchema = z.object({
 
 export type GymInput = z.infer<typeof gymInputSchema>
 export type { GymEntry, NewGymEntry } from "@/db/schema/gym"
+
+export type ExerciseSuggestion = { name: string; category: string | null }
