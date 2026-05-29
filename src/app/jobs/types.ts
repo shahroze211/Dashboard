@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { JOB_STATUSES, JOB_SOURCES } from "@/lib/constants"
+import { JOB_STATUSES, JOB_SOURCES, JOB_CATEGORIES } from "@/lib/constants"
 
 export const jobInputSchema = z.object({
   company: z
@@ -12,6 +12,9 @@ export const jobInputSchema = z.object({
     .trim()
     .min(1, "Role is required")
     .max(200, "Role is too long"),
+  category: z
+    .enum([...JOB_CATEGORIES, ""] as [string, ...string[]])
+    .optional(),
   status: z.enum(JOB_STATUSES).default("applied"),
   appliedAt: z
     .union([z.string(), z.date(), z.undefined(), z.null()])

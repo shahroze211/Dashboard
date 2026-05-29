@@ -34,6 +34,16 @@ export const JOB_SOURCE_LABELS: Record<JobSource, string> = {
   other: "Other",
 }
 
+export const JOB_CATEGORIES = ["ai-ml", "swe", "data", "fullstack"] as const
+export type JobCategory = (typeof JOB_CATEGORIES)[number]
+
+export const JOB_CATEGORY_LABELS: Record<JobCategory, string> = {
+  "ai-ml": "AI / ML",
+  swe: "Software Engineering",
+  data: "Data",
+  fullstack: "Full-stack",
+}
+
 // ---------- Deadlines ----------
 export const DEADLINE_CATEGORIES = [
   "assignment",

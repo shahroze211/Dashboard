@@ -9,10 +9,19 @@ export const jobStatus = pgEnum("job_status", [
   "withdrawn",
 ])
 
+export const jobCategory = pgEnum("job_category", [
+  "ai-ml",
+  "swe",
+  "data",
+  "fullstack",
+])
+
 export const jobs = pgTable("jobs", {
   id: serial("id").primaryKey(),
   company: text("company").notNull(),
   role: text("role").notNull(),
+  category: jobCategory("category"),
+  logoDomain: text("logo_domain"),
   status: jobStatus("status").notNull().default("applied"),
   appliedAt: timestamp("applied_at", { withTimezone: true })
     .notNull()

@@ -10,6 +10,7 @@ import {
 import type {
   JobStatus,
   JobSource,
+  JobCategory,
   DeadlineCategory,
   GoalTimeframe,
 } from "@/lib/constants"
@@ -41,32 +42,48 @@ function startOfYear(): Date {
 }
 
 // ---------- Job seeds ----------
+// Real companies hiring across AI/ML, SWE, Data, and Full-stack — each links to
+// an accessible careers page, with the company's real domain for logo lookup.
 const jobSeeds: Array<{
   company: string
   role: string
+  category: JobCategory
   status: JobStatus
   appliedAt: Date
   source?: JobSource
   link?: string
+  logoDomain?: string
   location?: string
   salary?: string
   notes?: string
 }> = [
-  { company: "Stripe", role: "Software Engineer, Payments", status: "interviewing", appliedAt: daysAgo(2), source: "linkedin", link: "https://stripe.com/jobs", location: "Remote" },
-  { company: "Vercel", role: "Frontend Engineer", status: "applied", appliedAt: daysAgo(3), source: "company-site", link: "https://vercel.com/careers", location: "Remote" },
-  { company: "Linear", role: "Product Engineer", status: "applied", appliedAt: daysAgo(4), source: "linkedin", location: "Remote" },
-  { company: "Supabase", role: "Full-Stack Engineer", status: "offer", appliedAt: daysAgo(28), source: "referral", location: "Remote", salary: "Competitive", notes: "Referred by a mutual contact." },
-  { company: "Anthropic", role: "Software Engineer", status: "interviewing", appliedAt: daysAgo(10), source: "company-site", location: "Hybrid – SF" },
-  { company: "Cloudflare", role: "Engineering Intern", status: "rejected", appliedAt: daysAgo(40), source: "linkedin", notes: "Closed for the cycle." },
-  { company: "GitHub", role: "Frontend Engineer", status: "ghosted", appliedAt: daysAgo(60), source: "linkedin" },
-  { company: "Notion", role: "Junior Engineer", status: "applied", appliedAt: daysAgo(6), source: "other" },
-  { company: "PlanetScale", role: "Backend Engineer", status: "withdrawn", appliedAt: daysAgo(35), source: "linkedin", notes: "Took the offer at Supabase." },
-  { company: "Figma", role: "Software Engineer, Web", status: "applied", appliedAt: daysAgo(1), source: "company-site" },
-  { company: "Sentry", role: "Software Engineer", status: "interviewing", appliedAt: daysAgo(14), source: "referral" },
-  { company: "Replit", role: "Full-Stack Engineer", status: "applied", appliedAt: daysAgo(5), source: "linkedin", location: "Remote" },
-  { company: "Cursor", role: "Frontend Engineer", status: "applied", appliedAt: daysAgo(8), source: "company-site" },
-  { company: "Posthog", role: "Software Engineer", status: "rejected", appliedAt: daysAgo(45), source: "linkedin" },
-  { company: "Resend", role: "Full-Stack Engineer", status: "applied", appliedAt: daysAgo(7), source: "linkedin", location: "Remote" },
+  // AI / ML
+  { company: "OpenAI", role: "Machine Learning Engineer", category: "ai-ml", status: "interviewing", appliedAt: daysAgo(8), source: "linkedin", link: "https://openai.com/careers/", logoDomain: "openai.com", location: "San Francisco" },
+  { company: "Anthropic", role: "Research Engineer", category: "ai-ml", status: "applied", appliedAt: daysAgo(3), source: "company-site", link: "https://www.anthropic.com/careers", logoDomain: "anthropic.com", location: "San Francisco" },
+  { company: "Hugging Face", role: "Machine Learning Engineer", category: "ai-ml", status: "applied", appliedAt: daysAgo(5), source: "linkedin", link: "https://apply.workable.com/huggingface/", logoDomain: "huggingface.co", location: "Remote" },
+  { company: "Mistral AI", role: "ML Research Engineer", category: "ai-ml", status: "applied", appliedAt: daysAgo(6), source: "linkedin", link: "https://www.mistral.ai/careers", logoDomain: "mistral.ai", location: "Paris, FR" },
+  { company: "Aleph Alpha", role: "Machine Learning Engineer", category: "ai-ml", status: "interviewing", appliedAt: daysAgo(12), source: "linkedin", link: "https://jobs.ashbyhq.com/AlephAlpha", logoDomain: "aleph-alpha.com", location: "Heidelberg, DE" },
+
+  // Software Engineering
+  { company: "Stripe", role: "Software Engineer, Backend", category: "swe", status: "interviewing", appliedAt: daysAgo(9), source: "linkedin", link: "https://stripe.com/jobs", logoDomain: "stripe.com", location: "Remote" },
+  { company: "GitLab", role: "Backend Engineer", category: "swe", status: "applied", appliedAt: daysAgo(4), source: "company-site", link: "https://about.gitlab.com/jobs/", logoDomain: "gitlab.com", location: "Remote" },
+  { company: "GitHub", role: "Software Engineer", category: "swe", status: "ghosted", appliedAt: daysAgo(40), source: "linkedin", link: "https://www.github.careers/careers-home", logoDomain: "github.com", location: "Remote" },
+  { company: "SAP", role: "Software Developer", category: "swe", status: "applied", appliedAt: daysAgo(7), source: "linkedin", link: "https://jobs.sap.com/", logoDomain: "sap.com", location: "Walldorf, DE" },
+  { company: "N26", role: "Backend Engineer", category: "swe", status: "offer", appliedAt: daysAgo(20), source: "referral", link: "https://n26.com/en-eu/careers", logoDomain: "n26.com", location: "Berlin, DE", notes: "Referred by a mutual contact." },
+
+  // Data
+  { company: "Databricks", role: "Data Engineer", category: "data", status: "applied", appliedAt: daysAgo(2), source: "linkedin", link: "https://www.databricks.com/company/careers", logoDomain: "databricks.com", location: "San Francisco" },
+  { company: "Snowflake", role: "Data Platform Engineer", category: "data", status: "rejected", appliedAt: daysAgo(38), source: "linkedin", link: "https://careers.snowflake.com/us/en", logoDomain: "snowflake.com", location: "Bozeman, MT" },
+  { company: "Confluent", role: "Data Infrastructure Engineer", category: "data", status: "applied", appliedAt: daysAgo(10), source: "company-site", link: "https://careers.confluent.io/", logoDomain: "confluent.io", location: "Mountain View, CA" },
+  { company: "dbt Labs", role: "Analytics Engineer", category: "data", status: "applied", appliedAt: daysAgo(6), source: "linkedin", link: "https://job-boards.greenhouse.io/dbtlabsinc", logoDomain: "getdbt.com", location: "Remote" },
+  { company: "Celonis", role: "Data Engineer", category: "data", status: "interviewing", appliedAt: daysAgo(14), source: "linkedin", link: "https://careers.celonis.com/join-us/open-positions", logoDomain: "celonis.com", location: "Munich, DE" },
+
+  // Full-stack
+  { company: "Vercel", role: "Full-Stack Engineer", category: "fullstack", status: "applied", appliedAt: daysAgo(1), source: "company-site", link: "https://vercel.com/careers", logoDomain: "vercel.com", location: "Remote" },
+  { company: "Datadog", role: "Software Engineer, Full-Stack", category: "fullstack", status: "applied", appliedAt: daysAgo(11), source: "linkedin", link: "https://careers.datadoghq.com/all-jobs/", logoDomain: "datadoghq.com", location: "New York" },
+  { company: "Spotify", role: "Full-Stack Engineer", category: "fullstack", status: "rejected", appliedAt: daysAgo(30), source: "linkedin", link: "https://www.lifeatspotify.com/jobs", logoDomain: "spotify.com", location: "Stockholm, SE" },
+  { company: "Zalando", role: "Frontend Engineer", category: "fullstack", status: "applied", appliedAt: daysAgo(5), source: "linkedin", link: "https://jobs.zalando.com/en/jobs/", logoDomain: "zalando.com", location: "Berlin, DE" },
+  { company: "Personio", role: "Full-Stack Engineer", category: "fullstack", status: "applied", appliedAt: daysAgo(8), source: "linkedin", link: "https://www.personio.com/about-personio/careers/", logoDomain: "personio.com", location: "Munich, DE" },
 ]
 
 // ---------- Deadline seeds ----------

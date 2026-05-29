@@ -25,6 +25,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
+  JOB_CATEGORIES,
+  JOB_CATEGORY_LABELS,
   JOB_SOURCES,
   JOB_SOURCE_LABELS,
   JOB_STATUSES,
@@ -36,6 +38,7 @@ import { createJob, updateJob } from "../actions"
 type FormValues = {
   company: string
   role: string
+  category: string
   status: (typeof JOB_STATUSES)[number]
   appliedAt: string
   link: string
@@ -48,6 +51,7 @@ type FormValues = {
 const toFormValues = (job?: Job): FormValues => ({
   company: job?.company ?? "",
   role: job?.role ?? "",
+  category: job?.category ?? "",
   status: job?.status ?? "applied",
   appliedAt: job
     ? format(job.appliedAt, "yyyy-MM-dd")
@@ -132,6 +136,26 @@ export function JobFormDialog({
                 placeholder="Software Engineer"
                 {...form.register("role")}
               />
+            </Field>
+            <Field label="Category">
+              <Select
+                value={form.watch("category") || "_none"}
+                onValueChange={(v) =>
+                  form.setValue("category", v === "_none" ? "" : v)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="—" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none">—</SelectItem>
+                  {JOB_CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {JOB_CATEGORY_LABELS[c]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
             <Field label="Status">
               <Select

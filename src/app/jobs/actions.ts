@@ -6,7 +6,7 @@ import { z } from "zod"
 import { db } from "@/db"
 import { jobs } from "@/db/schema"
 import { jobInputSchema } from "./types"
-import { JOB_STATUSES, type JobStatus } from "@/lib/constants"
+import { JOB_STATUSES, type JobStatus, type JobCategory } from "@/lib/constants"
 
 const idSchema = z.number().int().positive()
 
@@ -18,6 +18,10 @@ function buildJobValues(data: z.infer<typeof jobInputSchema>) {
   return {
     company: data.company,
     role: data.role,
+    category:
+      data.category && data.category !== ""
+        ? (data.category as JobCategory)
+        : null,
     status: data.status,
     appliedAt: data.appliedAt,
     link: data.link?.trim() || null,
@@ -71,6 +75,7 @@ export async function updateJob(
     .set({
       company: values.company,
       role: values.role,
+      category: values.category,
       status: values.status,
       ...(values.appliedAt ? { appliedAt: values.appliedAt } : {}),
       link: values.link,
