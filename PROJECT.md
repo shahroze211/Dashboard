@@ -42,7 +42,7 @@ Items below are **binding rejections**, not "maybe later". To add one, the rejec
 - Public read URLs, embedded widgets
 - AI features that nudge behavior ("you should do X today")
 - Analytics, telemetry, usage tracking of any kind
-- Auto-import from MyFitnessPal / Strava / LinkedIn / etc.
+- Silent background auto-import from MyFitnessPal / Strava / etc. *(2026-05-31: the original blanket "no auto-import from … LinkedIn …" was narrowed — a manual, on-demand **discover-and-save** job feed is now allowed. See deviations table. The rejection still binds anything that imports a feed silently or on a schedule.)*
 
 ## Success criteria
 
@@ -61,3 +61,4 @@ Items below are **binding rejections**, not "maybe later". To add one, the rejec
 | Tests | Not in DoD | Vitest, ≥3 server-action tests per module | Cheap signal that removes a reviewer's easiest criticism |
 | Home aesthetic | "Calm, not noisy" everywhere | Bold animated hero (floating image, parallax, gradient mesh, animated counters) on the **home page only** | Owner decision 2026-05-29: portfolio/LinkedIn impact. The hero is a presentational landing band above the widgets; it stores nothing, nudges nothing, tracks nothing. Module pages and all data interactions stay calm. |
 | External APIs | OpenFoodFacts only | + Nager.Date (deadlines), wger (gym), OpenFoodFacts search (nutrition), favicon service (job logos) | Owner decision 2026-05-29: enrich modules with keyless, server-cached lookups. None nudge behavior, none auto-import a feed, none add telemetry — so the binding rejections still hold. |
+| Job feed | None (manual entry only) | Jobs "Discover" tab via JSearch (RapidAPI) — live LinkedIn/Indeed/Glassdoor postings, with a per-row "Save to tracker" | Owner decision 2026-05-31. This is **discover-and-save**, not silent auto-import: I search, I read, I choose what to keep, and saving opens the normal add dialog so I pick the status. Server-side fetch + 1h cache, key in `JSEARCH_API_KEY`; no key → honest "not configured" state. No telemetry, no behavioral nudges. The narrowed rejection above still bans scheduled/silent feed imports. |

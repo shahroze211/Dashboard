@@ -192,6 +192,7 @@ Every task is done only when:
 ```
 DATABASE_URL=           # Supabase pooled connection
 DIRECT_URL=             # Supabase direct connection (for drizzle-kit)
+JSEARCH_API_KEY=        # Jobs Discover feed (JSearch via RapidAPI); empty = feed shows "not configured"
 RESEND_API_KEY=         # Reminder emails
 CRON_SECRET=            # Vercel Cron auth header
 ```

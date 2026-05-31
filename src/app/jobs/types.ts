@@ -38,6 +38,7 @@ export const jobInputSchema = z.object({
   notes: z.string().max(5000).optional().or(z.literal("")),
   salary: z.string().trim().max(200).optional().or(z.literal("")),
   location: z.string().trim().max(200).optional().or(z.literal("")),
+  logoDomain: z.string().trim().max(255).optional().or(z.literal("")),
   source: z
     .enum([...JOB_SOURCES, ""] as [string, ...string[]])
     .optional(),

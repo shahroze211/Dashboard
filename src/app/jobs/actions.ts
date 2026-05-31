@@ -28,6 +28,7 @@ function buildJobValues(data: z.infer<typeof jobInputSchema>) {
     notes: data.notes?.trim() || null,
     salary: data.salary?.trim() || null,
     location: data.location?.trim() || null,
+    logoDomain: data.logoDomain?.trim() || null,
     source: data.source && data.source !== "" ? data.source : null,
   }
 }
@@ -82,6 +83,7 @@ export async function updateJob(
       notes: values.notes,
       salary: values.salary,
       location: values.location,
+      logoDomain: values.logoDomain,
       source: values.source,
       updatedAt: new Date(),
     })

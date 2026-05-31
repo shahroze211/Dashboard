@@ -1,6 +1,6 @@
 # Status
 
-**Last updated:** 2026-05-29
+**Last updated:** 2026-05-31
 
 ## Built
 
@@ -25,6 +25,10 @@ All 5 modules shipped. v1 is feature-complete.
   - **Gym** — wger exercise search: type-ahead autocomplete in the log dialog with a transient muscle-group hint.
   - **Nutrition** — OpenFoodFacts search-by-name fallback for when a barcode lookup misses; results fill the form on tap.
   - **Jobs** — company logos via the Google favicon service, derived from the application link domain, with a monogram fallback.
+
+### v3 — shipped 2026-05-31
+
+- **Jobs "Discover" feed** — `/jobs` now has a **Tracked / Discover** tab switcher. Discover queries the [JSearch API](https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch) (RapidAPI), which aggregates live postings from LinkedIn, Indeed, Glassdoor and other boards. Server-side fetch + 1h cache (`src/lib/jobs-discover.ts`), mirroring the OpenFoodFacts pattern. Each result shows the company logo, location, salary, posting age and source board, with an external link and a **Save to tracker** button that opens the normal add dialog pre-filled (so you still choose the status — honest by default). Key lives in `JSEARCH_API_KEY`; with no key the feed shows an honest "not configured" empty state. `logoDomain` is now threaded through the job form/action so saved discoveries keep their logo. Documented as a deviation in `PROJECT.md` (the blanket "no LinkedIn auto-import" rejection was narrowed to "no *silent/scheduled* auto-import"; this is manual discover-and-save).
 
 ## Definition of done — checked
 

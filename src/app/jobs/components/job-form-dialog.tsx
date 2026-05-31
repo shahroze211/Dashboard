@@ -35,7 +35,7 @@ import {
 import { jobInputSchema, type Job } from "../types"
 import { createJob, updateJob } from "../actions"
 
-type FormValues = {
+export type FormValues = {
   company: string
   role: string
   category: string
@@ -45,6 +45,7 @@ type FormValues = {
   notes: string
   salary: string
   location: string
+  logoDomain: string
   source: string
 }
 
@@ -60,6 +61,7 @@ const toFormValues = (job?: Job): FormValues => ({
   notes: job?.notes ?? "",
   salary: job?.salary ?? "",
   location: job?.location ?? "",
+  logoDomain: job?.logoDomain ?? "",
   source: job?.source ?? "",
 })
 
@@ -67,22 +69,25 @@ export function JobFormDialog({
   open,
   onOpenChange,
   job,
+  prefill,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   job?: Job
+  /** Pre-fill values for a brand-new job (e.g. from the Discover feed). */
+  prefill?: Partial<FormValues>
 }) {
   const isEdit = Boolean(job)
   const [pending, startTransition] = useTransition()
 
   const form = useForm<FormValues>({
     resolver: zodResolver(jobInputSchema) as never,
-    defaultValues: toFormValues(job),
+    defaultValues: { ...toFormValues(job), ...prefill },
   })
 
   useEffect(() => {
-    if (open) form.reset(toFormValues(job))
-  }, [open, job, form])
+    if (open) form.reset({ ...toFormValues(job), ...prefill })
+  }, [open, job, prefill, form])
 
   const onSubmit = form.handleSubmit((values) => {
     startTransition(async () => {
@@ -123,6 +128,7 @@ export function JobFormDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} className="grid gap-4">
+          <input type="hidden" {...form.register("logoDomain")} />
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Company" required error={form.formState.errors.company?.message}>
               <Input
