@@ -3,6 +3,8 @@ import { formatDistanceToNowStrict } from "date-fns"
 import { db } from "@/db"
 import { deadlines, goals, gymEntries, jobs } from "@/db/schema"
 import { Hero, type HeroStat } from "@/components/shared/hero"
+import { SheetWidget } from "@/components/shared/sheet-widget"
+import { isSheetConfigured } from "@/lib/sheets"
 import { JobsWidget } from "./jobs/components/jobs-widget"
 import { DeadlinesWidget } from "./deadlines/components/deadlines-widget"
 import { GoalsWidget } from "./goals/components/goals-widget"
@@ -58,6 +60,9 @@ export default async function DashboardHome() {
     <GoalsWidget key="goals" />,
     <GymWidget key="gym" />,
     <NutritionWidget key="nutrition" />,
+    // Optional Google Sheets bridge — only shown when configured, so the home
+    // screen stays calm for setups that don't use it.
+    ...(isSheetConfigured() ? [<SheetWidget key="sheet" />] : []),
   ]
   return (
     <div className="mx-auto max-w-6xl">

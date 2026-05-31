@@ -193,6 +193,10 @@ Every task is done only when:
 DATABASE_URL=           # Supabase pooled connection
 DIRECT_URL=             # Supabase direct connection (for drizzle-kit)
 JSEARCH_API_KEY=        # Jobs Discover feed (JSearch via RapidAPI); empty = feed shows "not configured"
+GOOGLE_SHEETS_API_KEY=  # Google Sheets read widget (optional)
+GOOGLE_SHEET_ID=        # Sheet id from its URL; widget shown on home only when this + the key are set
+GOOGLE_SHEET_RANGE=     # Optional A1 range (default A1:Z100)
+GOOGLE_SHEET_LABEL=     # Optional widget title (default "Sheet")
 RESEND_API_KEY=         # Reminder emails
 CRON_SECRET=            # Vercel Cron auth header
 ```
